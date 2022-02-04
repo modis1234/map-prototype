@@ -1,38 +1,89 @@
 .App {
-  text-align: center;
+    text-align: center;
 }
 
 .App-logo {
-  height: 40vmin;
-  pointer-events: none;
+    height: 40vmin;
+    pointer-events: none;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+    .App-logo {
+        animation: App-logo-spin infinite 20s linear;
+    }
 }
 
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+    background-color: #282c34;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
 }
 
 .App-link {
-  color: #61dafb;
+    color: #61dafb;
 }
 
 @keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@font-face {
+    font-family: 'NotoSansCJKkr-Regular';
+    src: url('./fonts/NotoSansKR/NotoSansKR-Regular.otf');
+}
+@font-face {
+    font-family: 'NotoSansCJKkr-Medium';
+    src: url('./fonts/NotoSansKR/NotoSansKR-Medium.otf');
+}
+@font-face {
+    font-family: 'NotoSansCJKkr-Bold';
+    src: url('./fonts/NotoSansKR/NotoSansKR-Bold.otf');
+}
+@font-face {
+    font-family: 'NotoSansCJKkr-Light';
+    src: url('./fonts/NotoSansKR/NotoSansKR-Light.otf');
+}
+@font-face {
+    font-family: 'NotoSansCJKkr-DemiLight';
+    src: url('./fonts/NotoSansKR/NotoSansKR-DemiLight.otf');
+}
+
+/*  나눔스퀘어 폰트 */
+@font-face {
+    font-family: 'NanumSquareR';
+    src: url('./fonts/Nanumsquare/NanumSquare_acR.ttf');
+}
+@font-face {
+    font-family: 'NanumSquareEB';
+    src: url('./fonts/Nanumsquare/NanumSquare_acEB.ttf');
+}
+@font-face {
+    font-family: 'NanumSquareB';
+    src: url('./fonts/Nanumsquare/NanumSquare_acB.ttf');
+}
+@font-face {
+    font-family: 'NanumSquareL';
+    src: url('./fonts/Nanumsquare/NanumSquare_acL.ttf');
+}
+
+/*  DS-digital 폰트 */
+@font-face {
+    font-family: 'DS-Digital';
+    src: url('./fonts/DS-digital/DS-DIGI.TTF');
+}
+
+/* RobotoMono 폰트(비콘) */
+@font-face {
+    font-family: 'RobotoMono-Medium';
+    src: url('./fonts/RobotoMono-Medium.ttf');
 }

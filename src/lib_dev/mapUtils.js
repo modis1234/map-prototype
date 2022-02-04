@@ -45,8 +45,34 @@ const mapUtils = {
             shaftInfo !== null ? shaftInfo.end_point + blockLength : 0;
 
         let mapArr = [];
+        let divisionBlockLeng = 0;
         for (let i = 1; i <= blockAmount; i++) {
-            const divisionBlockLeng = blockLength * i; // 위치
+            const _asImage = block_image.as.find((blockItem) => {
+                const { length } = blockItem;
+
+                if (
+                    length >= blockLength * (i - 1) &&
+                    length < blockLength * i
+                ) {
+                    return blockItem;
+                }
+            });
+
+            const _blockLength =
+                _asImage && _asImage?.block_length
+                    ? _asImage.block_length
+                    : blockLength;
+            console.log('asImage-->', _asImage);
+
+            // const divisionBlockLeng =
+            //     _asImage && _asImage?.block_length
+            //         ? blockLength * (i - 1) + _asImage.block_length
+            //         : blockLength * i; // 위치
+            divisionBlockLeng =
+                _asImage && _asImage?.block_length
+                    ? divisionBlockLeng + _asImage.block_length
+                    : divisionBlockLeng + _blockLength;
+
             const _shaft = isShaft
                 ? divisionBlockLeng > shaftStartPoint &&
                   divisionBlockLeng < shaftEndPoint
@@ -62,7 +88,7 @@ const mapUtils = {
                 : true;
             const _entry = isEntry
                 ? divisionBlockLeng <= shaftEntryPoint &&
-                  blockLength * (i + 1) > shaftEntryPoint
+                  _blockLength * (i + 1) > shaftEntryPoint
                     ? true
                     : false
                 : false;
@@ -82,8 +108,8 @@ const mapUtils = {
                             ? forwardDig >= divisionBlockLeng
                                 ? true
                                 : false //시점
-                            : shaftInfo.forward_dig > blockLength * (i - 1) &&
-                              shaftInfo.forward_dig + blockLength <
+                            : shaftInfo.forward_dig > _blockLength * (i - 1) &&
+                              shaftInfo.forward_dig + _blockLength <
                                   divisionBlockLeng
                             ? true
                             : shaftEntryPoint - shaftInfo.forward_dig >
@@ -109,7 +135,7 @@ const mapUtils = {
                         ? true
                         : false // 미굴착
                     : //정방향 이라면
-                    reversDig >= totalLength - blockLength * (i - 1) ||
+                    reversDig >= totalLength - _blockLength * (i - 1) ||
                       reversDig === reversLength // 1블럭당 306m로 구간이 짧아 1블럭을 기본으로 추가 해준다.
                     ? true // 굴착
                     : reversDig > 0 && blockAmount === i
@@ -184,6 +210,10 @@ const mapUtils = {
                     vehicle: !_entry ? true : false,
                     cctv: !_entry ? true : false,
                     scanner: !_entry ? true : false,
+                    sensor: !_entry ? true : false,
+                    phone: !_entry ? true : false,
+                    tts: !_entry ? true : false,
+                    wifi: !_entry ? true : false,
                 },
                 block_image,
             };
@@ -194,8 +224,8 @@ const mapUtils = {
     rendering(initTopPoint, initLeftPoint, items, isExpand = false) {
         return (
             <>
-                {items.map((item, index) => {
-                    console.log('item-->', item);
+                {items.map((item, index, arr) => {
+                    // console.log('item-->', item);
                     const {
                         objectId,
                         shaft,
@@ -207,21 +237,75 @@ const mapUtils = {
                         open,
                         block_image,
                     } = item;
-                    const _blockStyled = {
-                        top: !isExpand
-                            ? `${initTopPoint - 30 * index}px`
-                            : `${initTopPoint - 61 * index}px`,
-                        left: !isExpand
-                            ? `${initLeftPoint + 52 * index}px`
-                            : `${initLeftPoint + 107 * index}px`,
-                        zIndex: `${99 - objectId - index}`,
-                        // backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                    };
 
-                    const _openImage = block_image?.open
+                    // const _openImage = block_image?.open
+                    //     ? block_image.open.src
+                    //     : 'open.png';
+
+                    const _asImage = block_image.as.find((blockItem) => {
+                        const { length } = blockItem;
+                        const calaBLength = length + item.block_length;
+                        if (
+                            (arr[index - 1] &&
+                                calaBLength > arr[index - 1].division_length &&
+                                calaBLength <= division_length) ||
+                            (!arr[index + 1] &&
+                                calaBLength > arr[index - 1].division_length) ||
+                            (!arr[index - 1] && calaBLength < item.block_length)
+                        ) {
+                            console.log('-->', item);
+                            return blockItem;
+                        }
+
+                        // if (
+                        //     arr[index + 1] &&
+                        //     calaBLength > division_length &&
+                        //     calaBLength < arr[index + 1].division_length
+                        // ) {
+                        //     console.log('division_length-->', division_length);
+                        //     console.log(
+                        //         'arr[index + 1]-->',
+                        //         arr[index + 1].division_length,
+                        //     );
+                        //     console.log('item-->', item);
+                        //     return blockItem;
+                        // }
+                    });
+
+                    console.log(_asImage);
+
+                    let _topMove = -31;
+                    let _leftMove = 53;
+
+                    const _blockStyled =
+                        _asImage && _asImage.block.style?.divStyle
+                            ? {
+                                  top: `${initTopPoint + _topMove * index}px`,
+                                  left: `${
+                                      initLeftPoint + _leftMove * index
+                                  }px`,
+                                  zIndex: `${99 - objectId - index}`,
+                                  // backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                                  ..._asImage.block.style.divStyle,
+                              }
+                            : {
+                                  top: `${initTopPoint + _topMove * index}px`,
+                                  left: `${
+                                      initLeftPoint + _leftMove * index
+                                  }px`,
+                                  zIndex: `${99 - objectId - index}`,
+                                  // backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                              };
+
+                    const _openImage = _asImage
+                        ? _asImage.block.open
+                        : block_image?.open
                         ? block_image.open.src
                         : 'open.png';
-                    const _closeImage = block_image?.close
+
+                    const _closeImage = _asImage
+                        ? _asImage.block.close
+                        : block_image?.close
                         ? block_image.close.src
                         : 'close.png';
 
@@ -230,31 +314,109 @@ const mapUtils = {
                     //     height: !isExpand ? '162px' : '218px',
                     // };
 
-                    const _imgStyled = open
-                        ? block_image.open.style
-                        : block_image.close.style;
+                    const _imgStyled =
+                        _asImage && _asImage.block.style?.imgStyle
+                            ? _asImage.block.style.imgStyle
+                            : open
+                            ? block_image.open.style
+                            : block_image.close.style;
 
-                    const workerStyled = {
-                        backgroundImage: shaft
-                            ? revers
-                                ? 'url("/images/map/workerFor.png")'
-                                : 'url("/images/map/workerRev.png")'
-                            : revers
-                            ? 'url("/images/map/workerRev.png")'
-                            : 'url("/images/map/workerFor.png")',
-                        backgroundRepeat: 'no-repeat',
-                    };
+                    const workerStyled =
+                        _asImage && _asImage?.worker
+                            ? {
+                                  backgroundImage: `url("/images/map/icon/${_asImage.worker.src}")`,
+                                  ..._asImage.worker.style,
+                                  backgroundRepeat: 'no-repeat',
+                              }
+                            : {
+                                  backgroundImage: shaft
+                                      ? revers
+                                          ? 'url("/images/map/icon/workerFor.png")'
+                                          : 'url("/images/map/icon/workerRev.png")'
+                                      : revers
+                                      ? 'url("/images/map/icon/workerRev.png")'
+                                      : 'url("/images/map/icon/workerFor.png")',
+                                  backgroundRepeat: 'no-repeat',
+                              };
 
-                    const vehicleStyled = {
-                        backgroundImage: shaft
-                            ? revers
-                                ? 'url("/images/map/vehFor.png")'
-                                : 'url("/images/map/vehRev.png")'
-                            : revers
-                            ? 'url("/images/map/vehRev.png")'
-                            : 'url("/images/map/vehFor.png")',
-                        backgroundRepeat: 'no-repeat',
-                    };
+                    const vehicleStyled =
+                        _asImage && _asImage?.vehicle
+                            ? {
+                                  backgroundImage: `url("/images/map/icon/${_asImage?.vehicle.src}")`,
+                                  ..._asImage.vehicle.style,
+                                  backgroundRepeat: 'no-repeat',
+                              }
+                            : {
+                                  backgroundImage: shaft
+                                      ? revers
+                                          ? 'url("/images/map/icon/vehFor.png")'
+                                          : 'url("/images/map/icon/vehRev.png")'
+                                      : revers
+                                      ? 'url("/images/map/icon/vehRev.png")'
+                                      : 'url("/images/map/icon/vehFor.png")',
+                                  backgroundRepeat: 'no-repeat',
+                              };
+                    const cctvStyled =
+                        _asImage && _asImage?.cctv
+                            ? {
+                                  backgroundImage: `url("/images/map/icon/${_asImage?.cctv.src}")`,
+                                  ..._asImage.cctv.style,
+                                  backgroundRepeat: 'no-repeat',
+                              }
+                            : {
+                                  backgroundImage: `url(/images/map/icon/CCTV.png)`,
+                                  top: '18px',
+                                  left: '-23px',
+                              };
+
+                    const sensorStyled =
+                        _asImage && _asImage?.sensor
+                            ? {
+                                  backgroundImage: `url("/images/map/icon/${_asImage?.sensor.src}")`,
+                                  ..._asImage.sensor.style,
+                                  backgroundRepeat: 'no-repeat',
+                              }
+                            : {
+                                  backgroundImage: `url(/images/map/icon/sensor.png)`,
+                                  top: '10px',
+                                  left: '-11px',
+                              };
+                    const phoneStyled =
+                        _asImage && _asImage?.phone
+                            ? {
+                                  backgroundImage: `url("/images/map/icon/${_asImage?.phone.src}")`,
+                                  ..._asImage.phone.style,
+                                  backgroundRepeat: 'no-repeat',
+                              }
+                            : {
+                                  backgroundImage: `url(/images/map/icon/phone.png)`,
+                                  top: '4px',
+                                  left: '-2px',
+                              };
+                    const ttsStyled =
+                        _asImage && _asImage?.tts
+                            ? {
+                                  backgroundImage: `url("/images/map/icon/${_asImage?.tts.src}")`,
+                                  ..._asImage.tts.style,
+                                  backgroundRepeat: 'no-repeat',
+                              }
+                            : {
+                                  backgroundImage: `url(/images/map/icon/tts.png)`,
+                                  top: '-6px',
+                                  left: '12px',
+                              };
+                    const wifiStyled =
+                        _asImage && _asImage?.tts
+                            ? {
+                                  backgroundImage: `url("/images/map/icon/${_asImage?.wifi.src}")`,
+                                  ..._asImage.wifi.style,
+                                  backgroundRepeat: 'no-repeat',
+                              }
+                            : {
+                                  backgroundImage: `url(/images/map/icon/wifi.png)`,
+                                  top: '-10px',
+                                  left: '23px',
+                              };
 
                     return (
                         <div
@@ -304,18 +466,62 @@ const mapUtils = {
                                     </div>
                                 </div>
                             )}
-                            {item.show.scanner && open && item.scanner && (
-                                <div className="scanner-icon">
-                                    <div className="scanner-img"></div>
-                                    <div className="scanner-device-box"></div>
-                                </div>
-                            )}
-                            {item.show.cctv && open && item.cctv && (
-                                <div className="cctv-icon">
-                                    <div className="cctv-img"></div>
-                                    <div className="cctv-device-box"></div>
-                                </div>
-                            )}
+                            <div className="icon-box">
+                                {item.show.scanner &&
+                                    open &&
+                                    item.scanner && (
+                                        <div className="scanner-icon">
+                                            <div
+                                                className="scanner-img"
+                                                style={scannerStyled}
+                                            ></div>
+                                            <div className="scanner-device-box"></div>
+                                        </div>
+                                    )}{' '}
+                                {item.show.cctv && open && item.cctv && (
+                                    <div
+                                        className="cctv-icon"
+                                        style={cctvStyled}
+                                    >
+                                        <div className="cctv-device-box"></div>
+                                    </div>
+                                )}
+                                {item.show.sensor && open && item.sensor && (
+                                    <div
+                                        className="sensor-icon"
+                                        style={sensorStyled}
+                                    >
+                                        <div className="sensor-device-box"></div>
+                                    </div>
+                                )}
+                                {item.show.phone && open && item.phone && (
+                                    <div
+                                        className="phone-icon"
+                                        style={phoneStyled}
+                                    >
+                                        <div className="phone-device-box">
+                                            <div className="phone-position">{`위치:${15}m`}</div>
+                                            <div className="phone-number">
+                                                070-9999-0015
+                                            </div>
+                                            <div className="tail"></div>
+                                        </div>
+                                    </div>
+                                )}
+                                {item.show.tts && open && item.tts && (
+                                    <div className="tts-icon" style={ttsStyled}>
+                                        <div className="tts-device-box"></div>
+                                    </div>
+                                )}
+                                {item.show.wifi && open && item.wifi && (
+                                    <div
+                                        className="wifi-icon"
+                                        style={wifiStyled}
+                                    >
+                                        <div className="wifi-device-box"></div>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     );
                 })}
