@@ -462,7 +462,27 @@ const MapContainer = () => {
             ],
         },
         is_entry: false, // 진입 지점 유무
-        is_shaft: false, // 사갱 지점 유무
+        is_shaft: true, // 사갱 지점 유무
+        shaft_info: {
+            //사갱 정보
+            total_length: 280, // 총 굴진거리
+            start_point: 800, // 사갱 시작 지점
+            end_point: 1100, // 사갱 끝 지점
+            forward_index: 'local003', // 정방향 노선 인덱스
+            forward_length: 280, // 정방향 굴진거리 (함양 시점 방향)
+            forward_dig: 100, // 정방향 진행 굴진거리
+            forward_device: {
+                cctv: 0, // cctv 설치 위치
+                scanner: 0, // 스캐너 설치 위치
+            },
+            revers_index: 'local004', // 역방향 노선 인덱스,
+            revers_length: 0, // 역방향 굴진거리 (함양 종점 방향)
+            revers_dig: 0, // 역방향 진행 굴진거리
+            revers_device: {
+                cctv: 0, // cctv 설치 위치
+                scanner: 0, // 스캐너 설치 위치
+            },
+        },
     });
 
     const setStateDig1 = (data) => {

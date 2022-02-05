@@ -225,7 +225,7 @@ const mapUtils = {
         return (
             <>
                 {items.map((item, index, arr) => {
-                    // console.log('item-->', item);
+                    console.log('item-->', item);
                     const {
                         objectId,
                         shaft,
@@ -253,7 +253,6 @@ const mapUtils = {
                                 calaBLength > arr[index - 1].division_length) ||
                             (!arr[index - 1] && calaBLength < item.block_length)
                         ) {
-                            console.log('-->', item);
                             return blockItem;
                         }
 
@@ -271,8 +270,6 @@ const mapUtils = {
                         //     return blockItem;
                         // }
                     });
-
-                    console.log(_asImage);
 
                     let _topMove = -31;
                     let _leftMove = 53;
