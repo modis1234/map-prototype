@@ -62,7 +62,6 @@ const mapUtils = {
                 _asImage && _asImage?.block_length
                     ? _asImage.block_length
                     : blockLength;
-            console.log('asImage-->', _asImage);
 
             // const divisionBlockLeng =
             //     _asImage && _asImage?.block_length
@@ -74,18 +73,20 @@ const mapUtils = {
                     : divisionBlockLeng + _blockLength;
 
             const _shaft = isShaft
-                ? divisionBlockLeng > shaftStartPoint &&
+                ? divisionBlockLeng >= shaftStartPoint &&
                   divisionBlockLeng < shaftEndPoint
                     ? true
                     : false
                 : false;
-            const _revers = _shaft
-                ? divisionBlockLeng <= shaftEntryPoint
+            // console.log('isShaft-->', isShaft);
+            const _revers = isShaft
+                ? divisionBlockLeng <= shaft_entry_point
                     ? false
                     : true
                 : divisionBlockLeng <= forwardLength
                 ? false
                 : true;
+            console.log('revers-->', _revers);
             const _entry = isEntry
                 ? divisionBlockLeng <= shaftEntryPoint &&
                   _blockLength * (i + 1) > shaftEntryPoint
@@ -93,55 +94,63 @@ const mapUtils = {
                     : false
                 : false;
 
+            /**
+             * 22.02.06 사갱 있을 때, 사갱-정방향만 적용, 사갱-역방향을 적용 안됨->커스터마이징 필요
+             */
+            const _isOpen = _shaft
+                ? !_revers
+                    ? shaftInfo.forward_dig >=
+                          shaft_entry_point - divisionBlockLeng && true
+                    : // 사갱-정방향
+                      false // 사갱-정방향    /* 사갱 있음 */
+                : divisionBlockLeng < forwardLength
+                ? forwardDig > divisionBlockLeng || forwardDig === forwardLength
+                    ? true // 굴착
+                    : forwardDig > 0 && i === 1
+                    ? true
+                    : false // 미굴착
+                : //정방향 이라면
+                reversDig >= totalLength - divisionBlockLeng && reversDig !== 0
+                ? true
+                : false; //역방향 이라면 /* 사갱 없음 */
+
             const obj = {
                 id: i,
                 value: i,
                 objectId,
-                local_index:
-                    divisionBlockLeng <= forwardLength
-                        ? forwardIndex
-                        : reverseIndex,
-                total_length: totalLength,
-                open: isShaft
+                local_index: _shaft
                     ? !_revers
-                        ? !_shaft
-                            ? forwardDig >= divisionBlockLeng
-                                ? true
-                                : false //시점
-                            : shaftInfo.forward_dig > _blockLength * (i - 1) &&
-                              shaftInfo.forward_dig + _blockLength <
-                                  divisionBlockLeng
-                            ? true
-                            : shaftEntryPoint - shaftInfo.forward_dig >
-                              divisionBlockLeng
-                            ? true
-                            : false // 사갱 시점 /** 시정방향 **/
-                        : !_shaft
-                        ? reversDig > totalLength - divisionBlockLeng &&
-                          reversLength !== 0
-                            ? true
-                            : false // 종점
-                        : shaftEntryPoint + shaftInfo.revers_dig >
-                          divisionBlockLeng
-                        ? //   shaftInfo.revers_dig < shaftEndPoint
-                          true
-                        : false // 사갱 종점 /** 종점방향 **/
-                    : // 사갱 있음
-                    divisionBlockLeng < forwardLength
-                    ? forwardDig >= divisionBlockLeng ||
+                        ? shaftInfo.forward_index
+                        : shaftInfo.revers_index
+                    : divisionBlockLeng <= forwardLength
+                    ? forwardIndex
+                    : reverseIndex,
+                total_length: totalLength,
+                open: _shaft
+                    ? !_revers
+                        ? shaftInfo.forward_dig >
+                              shaft_entry_point - divisionBlockLeng && true
+                        : false
+                    : divisionBlockLeng < forwardLength
+                    ? forwardDig > divisionBlockLeng ||
                       forwardDig === forwardLength
                         ? true // 굴착
                         : forwardDig > 0 && i === 1
                         ? true
                         : false // 미굴착
                     : //정방향 이라면
-                    reversDig >= totalLength - _blockLength * (i - 1) ||
-                      reversDig === reversLength // 1블럭당 306m로 구간이 짧아 1블럭을 기본으로 추가 해준다.
-                    ? true // 굴착
-                    : reversDig > 0 && blockAmount === i
+                    reversDig >= totalLength - divisionBlockLeng &&
+                      reversDig !== 0
                     ? true
-                    : false, // 미굴착 //역방향 이라면,
+                    : // reversDig >= totalLength - _blockLength * (i - 1) ||
+                      //   reversDig === reversLength // 1블럭당 306m로 구간이 짧아 1블럭을 기본으로 추가 해준다.
+                      // ? true // 굴착
+                      // : reversDig > 0 && blockAmount === i
+                      // ? true
+                      // :
+                      false, // 미굴착 //역방향 이라면,
                 // 사갱 없음
+                open: _isOpen,
                 worker: false,
                 worker_count: 0,
                 vehicle: false,

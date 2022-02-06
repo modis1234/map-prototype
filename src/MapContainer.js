@@ -260,22 +260,45 @@ const MapContainer = () => {
     const [first, setFirst] = useState({
         objectId: 1,
         block_length: 100,
-        total_length: 1295, // 총 굴진거리
+        total_length: 1300, // 총 굴진거리
         forward_index: 'loc001', // 정방향 노선 인덱스
         forward_length: 719, // 정방향 굴진거리 (함양 시점 방향)
-        forward_dig: 100, // 정방향 진행 굴진거리
+        forward_dig: 600, // 정방향 진행 굴진거리
         forward_device: {
             cctv: 50, // cctv 설치 위치
             scanner: 5, // 스캐너 설치 위치
         },
         revers_index: 'loc002', // 역방향 노선 인덱스,
-        revers_length: 196, // 역방향 굴진거리 (함양 종점 방향)
-        revers_dig: 196, // 역방향 진행 굴진거리
+        revers_length: 214, // 역방향 굴진거리 (함양 종점 방향)
+        revers_dig: 0, // 역방향 진행 굴진거리
         revers_device: {
             cctv: 153, // cctv 설치 위치
             scanner: 0, // 스캐너 설치 위치
         },
         block_amount: 13, // 맵 블록 갯수
+        is_entry: false, // 진입 지점 유무
+        is_shaft: true, // 사갱 지점 유무
+        shaft_entry_point: 1100, // 사갱 진입 지점
+        shaft_info: {
+            //사갱 정보
+            total_length: 280, // 총 굴진거리
+            start_point: 700, // 사갱 시작 지점
+            end_point: 1100, // 사갱 끝 지점
+            forward_index: 'loc003', // 정방향 노선 인덱스
+            forward_length: 280, // 정방향 굴진거리 (함양 시점 방향)
+            forward_dig: 50 + 200, // 정방향 진행 굴진거리
+            forward_device: {
+                cctv: 0, // cctv 설치 위치
+                scanner: 0, // 스캐너 설치 위치
+            },
+            revers_index: 'loc004', // 역방향 노선 인덱스,
+            revers_length: 0, // 역방향 굴진거리 (함양 종점 방향)
+            revers_dig: 0, // 역방향 진행 굴진거리
+            revers_device: {
+                cctv: 0, // cctv 설치 위치
+                scanner: 0, // 스캐너 설치 위치
+            },
+        },
         block_image: {
             open: {
                 src: 'open.png',
@@ -460,28 +483,6 @@ const MapContainer = () => {
                     },
                 },
             ],
-        },
-        is_entry: false, // 진입 지점 유무
-        is_shaft: true, // 사갱 지점 유무
-        shaft_info: {
-            //사갱 정보
-            total_length: 280, // 총 굴진거리
-            start_point: 800, // 사갱 시작 지점
-            end_point: 1100, // 사갱 끝 지점
-            forward_index: 'local003', // 정방향 노선 인덱스
-            forward_length: 280, // 정방향 굴진거리 (함양 시점 방향)
-            forward_dig: 100, // 정방향 진행 굴진거리
-            forward_device: {
-                cctv: 0, // cctv 설치 위치
-                scanner: 0, // 스캐너 설치 위치
-            },
-            revers_index: 'local004', // 역방향 노선 인덱스,
-            revers_length: 0, // 역방향 굴진거리 (함양 종점 방향)
-            revers_dig: 0, // 역방향 진행 굴진거리
-            revers_device: {
-                cctv: 0, // cctv 설치 위치
-                scanner: 0, // 스캐너 설치 위치
-            },
         },
     });
 
